@@ -4,7 +4,7 @@ class Filter extends React.Component {
   render() {
     return (
       <div>
-        <img />
+        <img alt="" />
         <input type="text" />
       </div>
     )
