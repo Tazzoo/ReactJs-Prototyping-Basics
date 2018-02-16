@@ -3,8 +3,8 @@ import defaultStyle from '../styles';
 
 class HoursCounter extends React.Component {
   render() {
-    let allSongs = this.props.playlistsInfo.reduce((acumulator, playlistInfo) => {
-      return acumulator.concat(playlistInfo.songs)
+    let allSongs = this.props.playlists.reduce((acumulator, playlist) => {
+      return acumulator.concat(playlist.songs)
     }, []);
 
     let totalDuration = allSongs.reduce((acumulator, song) => {
