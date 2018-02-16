@@ -1,14 +1,10 @@
 import React from 'react';
 
-class Filter extends React.Component {
-  render() {
-    return (
-      <div>
-        <img alt="" />
-        <input type="text" />
-      </div>
-    )
-  }
-}
+const Filter = (props) => (
+  <div>
+    <img alt="" />
+    <input type="text" value={props.filter} onChange={props.handleChange} />
+  </div>
+);
 
 export default Filter

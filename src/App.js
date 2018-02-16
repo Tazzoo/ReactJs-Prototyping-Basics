@@ -15,7 +15,7 @@ const fakeServerData = {
       info: [
         {
           id: 1,
-          name: 'Name 1',
+          name: 'Name 2',
           songs: [
             { name: 'Song 1', duration: 1345 },
             { name: 'Song 2', duration: 1236 },
@@ -57,7 +57,9 @@ const fakeServerData = {
 class App extends Component {
   constructor() {
     super();
-    this.state = { serverData: {} }
+    this.state = { serverData: {}, filter: '' }
+
+    this.handleChange = this.handleChange.bind(this);
   }
 
   componentWillMount() {
@@ -66,7 +68,13 @@ class App extends Component {
     }, 1000);
   }
 
+  handleChange(event) {
+    this.setState({ filter: event.target.value });
+  }
+
   render() {
+
+
     return (
       <div className="App">
         {
@@ -77,10 +85,10 @@ class App extends Component {
                 <PlaylistCounter playlists={this.state.serverData.user.playlists} />
                 <HoursCounter playlistsInfo={this.state.serverData.user.playlists.info} />
               </div>
-              <Filter />
+              <Filter filter={this.state.filter} handleChange={this.handleChange} />
               {
-                fakeServerData.user.playlists.info.map(playlistInfo => {
-                  return <Playlists key={playlistInfo.id} playlistInfo={playlistInfo} />
+                this.state.serverData.user.playlists.info.filter(info => info.name.toLowerCase().includes(this.state.filter.toLowerCase())).map(playlistInfo => {
+                  return <Playlists key={playlistInfo.id} playlistInfo={playlistInfo} filter={this.state.filter} />
                 })
               }
             </div> :
