@@ -3,66 +3,52 @@ import Playlist from './components/Playlist';
 import Filter from './components/Filter';
 import PlaylistCounter from "./components/PlaylistCounter";
 import HoursCounter from "./components/HoursCounter";
+import { Env } from "./config";
 import defaultStyle from './styles';
+import queryString from "querystring";
+import axios from "axios";
+import _ from "lodash";
 import './App.css';
-
-
-const fakeServerData = {
-  user: {
-    name: 'David',
-    playlists: [
-      {
-        id: 1,
-        name: 'Name 1',
-        songs: [
-          { name: 'Song 1', duration: 1345 },
-          { name: 'Song 2', duration: 1236 },
-          { name: 'Song 3', duration: 5000 }
-        ]
-      },
-      {
-        id: 2,
-        name: 'Name 2',
-        songs: [
-          { name: 'Song 3', duration: 1345 },
-          { name: 'Song 4', duration: 1236 },
-          { name: 'Song 5', duration: 6000 }
-        ]
-      },
-      {
-        id: 3,
-        name: 'Name 3',
-        songs: [
-          { name: 'Song 6', duration: 1345 },
-          { name: 'Song 7', duration: 1236 },
-          { name: 'Song 8', duration: 7000 }
-        ]
-      },
-      {
-        id: 4,
-        name: 'Name 4',
-        songs: [
-          { name: 'Song 9', duration: 1345 },
-          { name: 'Song 10', duration: 1236 },
-          { name: 'Song 11', duration: 8000 }
-        ]
-      }
-    ],
-  }
-}
 
 class App extends Component {
   constructor() {
     super();
-    this.state = { serverData: {}, filter: '' }
+    this.state = { user: {}, playlists: [], filter: '' }
 
     this.handleChange = this.handleChange.bind(this);
   }
 
-  componentWillMount() {
-    setTimeout(() => {
-      this.setState({ serverData: fakeServerData })
-    }, 1000);
+  async componentDidMount() {
+    let parsed = queryString.parse(window.location.search);
+    let accessToken = parsed['?access_token'];
+    try {
+      const res = await axios.get('https://api.spotify.com/v1/me', {
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        }
+      })
+      this.setState({ user: { name: res.data.id } })
+    } catch (err) {
+      console.log(err);
+    }
+
+    // Fetch Playlists
+    try {
+      const res = await axios.get('https://api.spotify.com/v1/me/playlists', {
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        }
+      })
+
+      let userPlaylists = res.data.items.map(item => (
+        { name: item.name, songs: [], imageUrl: item.images[0].url }
+      ))
+      console.log(userPlaylists)
+
+      this.setState({ playlists: userPlaylists });
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   handleChange(event) {
@@ -70,25 +56,35 @@ class App extends Component {
   }
 
   render() {
-    let playlistsSelected = [];
-    if (this.state.serverData.user) {
-      playlistsSelected = this.state.serverData.user.playlists.filter(playlist => playlist.name.toLowerCase().includes(this.state.filter.toLowerCase()));
-    }
+    let { user } = this.state
+    let { playlists } = this.state
+    let playlistsSelected = null;
+
+    !_.isEmpty(user) && !_.isEmpty(playlists)
+      ? playlistsSelected = playlists.filter(playlist =>
+        playlist.name.toLowerCase().includes(
+          this.state.filter.toLowerCase()))
+      : playlistsSelected = []
+
+    const env = window.location.href.includes('localhost')
+      ? Env.development
+      : Env.production
 
     return (
       <div className="App">
         {
-          this.state.serverData.user ?
-            <div>
-              <h1 style={defaultStyle}>{this.state.serverData.user.name}'s Playlist</h1>
+          !_.isEmpty(user)
+            ? <div>
+              <h1 style={defaultStyle}>Playlist de {user.name}</h1>
               <PlaylistCounter playlists={playlistsSelected} />
               <HoursCounter playlists={playlistsSelected} />
               <Filter filter={this.state.filter} handleChange={this.handleChange} />
               {
                 playlistsSelected.map(playlist => <Playlist key={playlist.id} playlist={playlist} />)
               }
-            </div> :
-            <h1 style={defaultStyle}>Loading</h1>
+            </div>
+
+            : <a href={env} style={{ width: '200px', padding: '20px', backgroundColor: '#CCC', borderRadius: '10px', display: 'inline-block', marginTop: '20px', textDecoration: 'none', textTransform: 'uppercase', color: '#000' }}>Entrar com Spotify</a>
         }
       </div>
     );
