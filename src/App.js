@@ -3,7 +3,7 @@ import Playlist from './components/Playlist';
 import Filter from './components/Filter';
 import PlaylistCounter from "./components/PlaylistCounter";
 import HoursCounter from "./components/HoursCounter";
-import { Env } from "./config";
+import Env from "./config/keys";
 import defaultStyle from './styles';
 import queryString from "querystring";
 import axios from "axios";
@@ -43,7 +43,6 @@ class App extends Component {
       let userPlaylists = res.data.items.map(item => (
         { name: item.name, songs: [], imageUrl: item.images[0].url }
       ))
-      console.log(userPlaylists)
 
       this.setState({ playlists: userPlaylists });
     } catch (err) {
