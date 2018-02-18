@@ -19,6 +19,7 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    // Fetch Name
     let parsed = queryString.parse(window.location.search);
     let accessToken = parsed['?access_token'];
     try {
@@ -66,8 +67,8 @@ class App extends Component {
       : playlistsSelected = []
 
     const env = window.location.href.includes('localhost')
-      ? Env.development
-      : Env.production
+      ? 'http://localhost:8888/login'
+      : 'https://react-ans-spotify-backend.herokuapp.com/login'
 
     return (
       <div className="App">
