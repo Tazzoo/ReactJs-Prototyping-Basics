@@ -3,7 +3,6 @@ import Playlist from './components/Playlist';
 import Filter from './components/Filter';
 import PlaylistCounter from "./components/PlaylistCounter";
 import HoursCounter from "./components/HoursCounter";
-// import Env from "./config/keys";
 import defaultStyle from './styles';
 import queryString from "querystring";
 import axios from "axios";
@@ -13,7 +12,7 @@ import './App.css';
 class App extends Component {
   constructor() {
     super();
-    this.state = { user: {}, playlists: [], filter: '' }
+    this.state = { user: { name: '' }, playlists: [], filter: '' }
 
     this.handleChange = this.handleChange.bind(this);
   }
@@ -22,33 +21,46 @@ class App extends Component {
     // Fetch Name
     let parsed = queryString.parse(window.location.search);
     let accessToken = parsed['?access_token'];
+    let userBlob = null
+    let userId = null
     try {
-      const res = await axios.get('https://api.spotify.com/v1/me', {
+      userBlob = await axios.get('https://api.spotify.com/v1/me', {
         headers: {
           'Authorization': 'Bearer ' + accessToken
         }
       })
-      this.setState({ user: { name: res.data.id } })
+      userId = userBlob.data.id;
+
     } catch (err) {
       console.log(err);
     }
 
     // Fetch Playlists
-    try {
-      const res = await axios.get('https://api.spotify.com/v1/me/playlists', {
-        headers: {
-          'Authorization': 'Bearer ' + accessToken
-        }
-      })
+    let playlistsBlob = await axios.get('https://api.spotify.com/v1/me/playlists', {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      }
+    })
+    const playlistsData = playlistsBlob.data.items.map(item => item);
 
-      let userPlaylists = res.data.items.map(item => (
-        { name: item.name, songs: [], imageUrl: item.images[0].url }
-      ))
+    // Fetch Songs
+    const playlistsLinks = playlistsBlob.data.items.map(item => item.href);
 
-      this.setState({ playlists: userPlaylists });
-    } catch (err) {
-      console.log(err);
-    }
+    let songsPromises = playlistsLinks.map(async playlistLink => await axios.get(playlistLink, {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      }
+    }));
+
+    const songsObject = await Promise.all(songsPromises)
+
+    songsObject.forEach((songObject, index) => {
+      const trackList = songObject.data.tracks.items.map(item => item.track)
+
+      playlistsData[index].songs = trackList;
+    })
+
+    this.setState({ user: { name: userId }, playlists: playlistsData })
   }
 
   handleChange(event) {
@@ -59,12 +71,14 @@ class App extends Component {
     let { user } = this.state
     let { playlists } = this.state
     let playlistsSelected = null;
+    const username = user.name.replace(/\b\w/g, l => l.toUpperCase());
 
     !_.isEmpty(user) && !_.isEmpty(playlists)
       ? playlistsSelected = playlists.filter(playlist =>
         playlist.name.toLowerCase().includes(
           this.state.filter.toLowerCase()))
       : playlistsSelected = []
+
 
     const env = window.location.href.includes('localhost')
       ? 'http://localhost:8888/login'
@@ -75,7 +89,7 @@ class App extends Component {
         {
           !_.isEmpty(user)
             ? <div>
-              <h1 style={defaultStyle}>Playlist de {user.name}</h1>
+              <h1 style={defaultStyle}>Playlist de {username}</h1>
               <PlaylistCounter playlists={playlistsSelected} />
               <HoursCounter playlists={playlistsSelected} />
               <Filter filter={this.state.filter} handleChange={this.handleChange} />
