@@ -1,10 +1,10 @@
 import React from 'react';
 
 const Filter = (props) => (
-  <div style={{ marginBottom: '30px' }}>
-    <img alt="" />
-    <input type="text" value={props.filter} onChange={props.handleChange} />
+  <div className="rl-filter">
+    <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" value={props.filter} onChange={props.handleChange} />
   </div>
+
 );
 
 export default Filter

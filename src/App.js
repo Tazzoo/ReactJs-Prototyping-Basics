@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import Playlist from './components/Playlist';
-import Filter from './components/Filter';
 import PlaylistCounter from "./components/PlaylistCounter";
 import HoursCounter from "./components/HoursCounter";
-import defaultStyle from './styles';
 import queryString from "querystring";
+import Info from "./components/Info";
 import axios from "axios";
 import _ from "lodash";
 import './App.css';
+
+import Navbar from "./components/Navbar";
 
 class App extends Component {
   constructor() {
@@ -73,32 +74,56 @@ class App extends Component {
     let playlistsSelected = null;
     const username = user.name.replace(/\b\w/g, l => l.toUpperCase());
 
-    !_.isEmpty(user) && !_.isEmpty(playlists)
-      ? playlistsSelected = playlists.filter(playlist =>
-        playlist.name.toLowerCase().includes(
-          this.state.filter.toLowerCase()))
-      : playlistsSelected = []
 
+    // Validate User
+    !_.isEmpty(user) && !_.isEmpty(playlists)
+      ? playlistsSelected = playlists.filter(playlist => {
+        const matchesPlaylist = playlist.name.toLowerCase().includes(
+          this.state.filter.toLowerCase());
+
+        // let allSongsName = []
+        // const matchesSong = _.values(playlists).map(playlist => playlist.songs).map(songs => songs.map(nested => nested.name))
+        // matchesSong.forEach(songArray => songArray.forEach(songName => allSongsName.push(songName)))
+
+        // let found = false;
+        // let a = allSongsName.find(song => song.toLowerCase().includes(this.state.filter.toLowerCase()))
+
+        // console.log(a)
+        // return matchesPlaylist || a;
+        return matchesPlaylist;
+      })
+      : playlistsSelected = []
 
     const env = window.location.href.includes('localhost')
       ? 'http://localhost:8888/login'
       : 'https://react-ans-spotify-backend.herokuapp.com/login'
 
     return (
-      <div className="App">
+      <div className="App mb-5">
+
         {
-          !_.isEmpty(user)
+          !_.isEmpty(user) && user.name.length > 0
             ? <div>
-              <h1 style={defaultStyle}>Playlist de {username}</h1>
-              <PlaylistCounter playlists={playlistsSelected} />
-              <HoursCounter playlists={playlistsSelected} />
-              <Filter filter={this.state.filter} handleChange={this.handleChange} />
-              {
-                playlistsSelected.map(playlist => <Playlist key={playlist.id} playlist={playlist} />)
-              }
+              <Navbar username={username} filter={this.state.filter} handleChange={this.handleChange} />
+
+              <div className="container mb-5">
+                <div className="row d-flex justify-content-around">
+                  <PlaylistCounter playlists={playlistsSelected} />
+                  <Info />
+                  <HoursCounter playlists={playlistsSelected} />
+                </div>
+              </div>
+
+              <div className="container">
+                <div className="row d-flex justify-content-around">
+                  {
+                    playlistsSelected.map(playlist => <Playlist key={playlist.id} playlist={playlist} />)
+                  }
+                </div>
+              </div>
             </div>
 
-            : <a href={env} style={{ width: '200px', padding: '20px', backgroundColor: '#CCC', borderRadius: '10px', display: 'inline-block', marginTop: '20px', textDecoration: 'none', textTransform: 'uppercase', color: '#000' }}>Entrar com Spotify</a>
+            : <a href={env} style={{ width: '300px', padding: '10px 20px', backgroundColor: '#343A40', borderRadius: '10px', display: 'inline-block', marginTop: '20px', textDecoration: 'none', color: '#FFF' }}>Entrar com Spotify</a>
         }
       </div>
     );

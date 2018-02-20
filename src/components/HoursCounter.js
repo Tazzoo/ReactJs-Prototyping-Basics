@@ -1,6 +1,5 @@
 import React from "react";
 import _ from "lodash";
-import defaultStyle from '../styles';
 
 const Hour = (props) => {
 
@@ -13,10 +12,13 @@ const Hour = (props) => {
   const totalMinutes = msToTime(totalMs)
 
   return (
-    <div style={{ width: "40%", display: "inline-block" }}>
-      <h2 style={defaultStyle}>
-        {totalMinutes}
-      </h2>
+    <div className="card rl-card" style={{ width: '90%' }} >
+      <div className="card-body" >
+        <h5 className="card-text" >
+          {/* <div style={{ width: "40%", display: "inline-block" }}> */}
+          {totalMinutes}
+        </h5>
+      </div>
     </div>
   )
 
