@@ -12,7 +12,7 @@ const Hour = (props) => {
   const totalMinutes = msToTime(totalMs)
 
   return (
-    <div className="card rl-card" style={{ width: '90%' }} >
+    <div className="card rl-card" style={{ display: 'inline-block', width: '30%' }} >
       <div className="card-body" >
         <h5 className="card-text" >
           {/* <div style={{ width: "40%", display: "inline-block" }}> */}

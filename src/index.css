@@ -10,9 +10,8 @@ body {
   margin: 10px 0px;
 }
 
-@media screen and (max-width: 560px) {
+@media screen and (max-width: 770px) {
   .rl-title {
-    /* display: none; */
     margin: 10px auto !important;
   }
 
@@ -21,13 +20,14 @@ body {
   }
 
   .rl-playlist {
-    margin: 20px 0px;
+    margin: 15px 0px !important;
+    width: 95vw !important;
+  }
+  .rl-card {
+    display: none;
   }
 }
 
 @media screen and (min-width: 561) {
-  .rl-card {
-    display: none;
-    /* width: 18rem !important; */
-  }
+  
 }

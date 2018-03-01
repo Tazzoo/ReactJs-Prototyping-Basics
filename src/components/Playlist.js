@@ -6,21 +6,21 @@ const Playlist = (props) => {
 
   const songsSorted = _.sortBy(props.playlist.songs, 'popularity').reverse();
 
-  /*const styles = {
+  const styles = {
     container: {
       margin: '0 auto',
-      maxWidth: '1920px',
-      width: '70%',
+      maxWidth: '60%',
+      width: '30%',
       // display: 'inline-block',
       // margin: '30px'
     }
-  }*/
+  }
 
   return (
-    <div className="col-sm rl-playlist">
+    <div className="col-sm rl-playlist" style={styles.container}>
       <div className="card">
         <div className="card-body">
-          <h5 className="card-title" style={{ margin: '0px' }}>{name}</h5>
+          <h5 className="card-title">{name}</h5>
         </div>
         <img className="card-img-top" src={props.playlist.images[0].url} alt="Playlist" />
         <ul className="list-group list-group-flush">
