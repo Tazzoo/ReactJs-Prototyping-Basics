@@ -1,5 +1,5 @@
 let express = require('express');
-let axios = require('axios');
+let request = require('request');
 let querystring = require('querystring');
 let config = require('./config/config');
 let app = express();
@@ -29,11 +29,11 @@ app.get('/callback', function(req, res) {
       grant_type: 'authorization_code'
     },
     headers: {
-      Authorization: 'Basic ' + new Buffer.from(config.SPOTIFY_CLIENT_ID + ':' + config.SPOTIFY_CLIENT_PASSWORD).toString('base64')
+      Authorization: 'Basic ' + Buffer.from(config.SPOTIFY_CLIENT_ID + ':' + config.SPOTIFY_CLIENT_PASSWORD).toString('base64')
     },
     json: true
   };
-  axios.post(authOptions, function(error, response, body) {
+  request.post(authOptions, function(error, response, body) {
     var access_token = body.access_token;
     let uri = process.env.FRONTEND_URI || 'http://localhost:3000';
     res.redirect(uri + '?access_token=' + access_token);
