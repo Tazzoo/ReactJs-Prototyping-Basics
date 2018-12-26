@@ -2,11 +2,7 @@
   "name": "react-spotify-client",
   "version": "0.1.0",
   "private": true,
-  "proxy": {
-    "/login": {
-      "target": "http://localhost:8888/"
-    }
-  },
+  "proxy": "http://localhost:8888/",
   "dependencies": {
     "axios": "^0.17.1",
     "bootstrap": "^4.1.3",
