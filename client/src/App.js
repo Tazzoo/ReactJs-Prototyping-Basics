@@ -1,143 +1,193 @@
-import React, { Component } from 'react';
-import Playlist from './components/Playlist';
-import PlaylistCounter from './components/PlaylistCounter';
-import HoursCounter from './components/HoursCounter';
-import queryString from 'querystring';
-import Info from './components/Info';
+import React from 'react';
 import axios from 'axios';
+import queryString from 'querystring';
 import _ from 'lodash';
+
+// Components
+import Navbar from './components/navbar/Navbar';
+import Header from './components/header/Header';
+import Playlists from './components/playlists/Playlists';
+import NotLoggedIn from './components/NotLoggedIn';
+
+// CSS
 import './App.css';
 
-import Navbar from './components/Navbar';
+class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            user: {
+                name: '',
+                accessToken: ''
+            },
+            playlists: [],
+            filter: '',
+            fetchData: false
+        };
 
-class App extends Component {
-  constructor() {
-    super();
-    this.state = { user: { name: '' }, playlists: [], filter: '' };
-
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  async componentDidMount() {
-    // Fetch Name
-    let parsed = queryString.parse(window.location.search);
-    let accessToken = parsed['?access_token'];
-    let userBlob = null;
-    let userId = null;
-    try {
-      userBlob = await axios.get('https://api.spotify.com/v1/me', {
-        headers: {
-          Authorization: 'Bearer ' + accessToken
-        }
-      });
-      userId = userBlob.data.id;
-    } catch (err) {
-      console.log(err);
+        this.findEnv = this.findEnv.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
-    // Fetch Playlists
-    let playlistsBlob = await axios.get('https://api.spotify.com/v1/me/playlists', {
-      headers: {
-        Authorization: 'Bearer ' + accessToken
-      }
-    });
-    const playlistsData = playlistsBlob.data.items.map(item => item);
+    async componentDidMount() {
+        this.setUserAccessToken();
+    }
 
-    // Fetch Songs
-    const playlistsLinks = playlistsBlob.data.items.map(item => item.href);
+    async componentDidUpdate() {
+        const { accessToken } = this.state.user;
+        const { fetchData } = this.state;
 
-    let songsPromises = playlistsLinks.map(
-      async playlistLink =>
-        await axios.get(playlistLink, {
-          headers: {
-            Authorization: 'Bearer ' + accessToken
-          }
-        })
-    );
+        if (!_.isEmpty(accessToken) && !fetchData) {
+            const username = await this.fetchUsername();
+            const playlists = await this.fetchUserPlaylists();
 
-    const songsObject = await Promise.all(songsPromises);
+            this.setState((currState, prevState) => {
+                return { ...currState, user: { ...currState.user, name: username }, playlists, fetchData: true };
+            });
+        }
+    }
 
-    songsObject.forEach((songObject, index) => {
-      const trackList = songObject.data.tracks.items.map(item => item.track);
+    render() {
+        let homepage;
+        let { user, playlists, filter } = this.state;
+        let searchPlaylist = null;
 
-      playlistsData[index].songs = trackList;
-    });
+        if (!_.isEmpty(user.name)) {
+            if (!_.isEmpty(playlists)) {
+                searchPlaylist = playlists.filter(playlist => {
+                    const matchesPlaylistName = playlist.name.toLowerCase().includes(filter.toLowerCase());
 
-    this.setState({ user: { name: userId }, playlists: playlistsData });
-  }
+                    // Compara se o nome no filtro bate com o nome da playlist
+                    if (matchesPlaylistName) {
+                        return matchesPlaylistName;
+                    }
 
-  handleChange(event) {
-    this.setState({ filter: event.target.value });
-  }
+                    // Compara se o nome no filtro bate com o nome de alguma musica
+                    let allSongsName = [];
+                    const playlistSongsName = this.getPlaylistSongsName(playlist);
+                    
+                    if (_.isEmpty(allSongsName)) {
+                        allSongsName = playlistSongsName;
+                    } else {
+                        allSongsName.push(playlistSongsName);
+                    }
 
-  render() {
-    let { user } = this.state;
-    let { playlists } = this.state;
-    let playlistsSelected = null;
-    const username = user.name.replace(/\b\w/g, l => l.toUpperCase());
+                    const matchesPlaylistSongName = allSongsName.find(song => song.toLowerCase().includes(filter.toLowerCase()));
 
-    // Validate User
-    !_.isEmpty(user) && !_.isEmpty(playlists)
-      ? (playlistsSelected = playlists.filter(playlist => {
-          const matchesPlaylist = playlist.name.toLowerCase().includes(this.state.filter.toLowerCase());
+                    // Retorna verdade se o nome de alguma letra já está na playlist
+                    return matchesPlaylistSongName;
+                });
+            } else {
+                searchPlaylist = [];
+            }
+        }
 
-          // let allSongsName = []
-          // const matchesSong = _.values(playlists).map(playlist => playlist.songs).map(songs => songs.map(nested => nested.name))
-          // matchesSong.forEach(songArray => songArray.forEach(songName => allSongsName.push(songName)))
+        const isUserLoggedIn = !_.isEmpty(user.accessToken) && !_.isEmpty(user.name);
+        if (isUserLoggedIn) {
+            homepage = (
+                <div>
+                    <Navbar username={user.name} filter={filter} handleChange={this.handleChange} />
+                    <Header playlists={searchPlaylist} />
+                    <Playlists playlists={searchPlaylist} />
+                </div>
+            );
+        } else {
+            homepage = <NotLoggedIn findEnv={this.findEnv} />;
+        }
 
-          // let found = false;
-          // let a = allSongsName.find(song => song.toLowerCase().includes(this.state.filter.toLowerCase()))
+        return <div className='App mb-5'>{homepage}</div>;
+    }
 
-          // console.log(a)
-          // return matchesPlaylist || a;
-          return matchesPlaylist;
-        }))
-      : (playlistsSelected = []);
+    handleChange(event) {
+        this.setState({ filter: event.target.value });
+    }
 
-    const env = window.location.href.includes('localhost') ? 'http://localhost:8888/login' : 'https://react-ans-spotify-backend.herokuapp.com/login';
+    findEnv() {
+        if (window.location.href.includes('localhost')) {
+            return 'http://localhost:8888/login';
+        }
 
-    return (
-      <div className='App mb-5'>
-        {!_.isEmpty(user) && user.name.length > 0 ? (
-          <div>
-            <Navbar username={username} filter={this.state.filter} handleChange={this.handleChange} />
+        return 'https://react-ans-spotify-backend.herokuapp.com/login';
+    }
 
-            <div className='container mb-5'>
-              <div className='row d-flex justify-content-around'>
-                <PlaylistCounter playlists={playlistsSelected} />
-                <Info />
-                <HoursCounter playlists={playlistsSelected} />
-              </div>
-            </div>
+    setUserAccessToken() {
+        const parsed = queryString.parse(window.location.search);
+        const accessToken = parsed['?access_token'];
 
-            <div className='container'>
-              <div className='row d-flex justify-content-around'>
-                {playlistsSelected.map(playlist => (
-                  <Playlist key={playlist.id} playlist={playlist} />
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <a
-            href={env}
-            style={{
-              width: '300px',
-              padding: '10px 20px',
-              backgroundColor: '#343A40',
-              borderRadius: '10px',
-              display: 'inline-block',
-              marginTop: '20px',
-              textDecoration: 'none',
-              color: '#FFF'
-            }}
-          >
-            Entrar com Spotify
-          </a>
-        )}
-      </div>
-    );
-  }
+        if (!_.isEmpty(accessToken)) {
+            this.setState((currState, prevState) => {
+                return { ...prevState, user: { accessToken } };
+            });
+        }
+    }
+
+    getPlaylistSongsName(playlist) {
+        return playlist.songs.map(song => song.name);
+    }
+
+    async fetchUsername() {
+        const { accessToken } = this.state.user;
+
+        try {
+            const { data } = await axios.get('https://api.spotify.com/v1/me', {
+                headers: {
+                    Authorization: 'Bearer ' + accessToken
+                }
+            });
+
+            return data.display_name;
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    async fetchUserPlaylists() {
+        const playlists = await this.fetchUserPlaylistsLinks();
+        const songs = await this.fetchUserSongs(playlists);
+
+        songs.forEach((song, index) => {
+            const trackList = song.data.tracks.items.map(item => item.track);
+
+            playlists[index].songs = [];
+            playlists[index].songs = trackList;
+        });
+
+        return playlists;
+    }
+
+    async fetchUserPlaylistsLinks() {
+        const { accessToken } = this.state.user;
+
+        const { data } = await axios.get('https://api.spotify.com/v1/me/playlists', {
+            headers: {
+                Authorization: 'Bearer ' + accessToken
+            }
+        });
+
+        return data.items;
+    }
+
+    async fetchUserSongs(playlists) {
+        const { accessToken } = this.state.user;
+
+        const songsLinks = playlists.map(playlist => playlist.href);
+
+        // const songsPromises = songsLinks.forEach(songLink => {
+        //   const songs = await axios.get(songLink)
+        // })
+        const songsPromises = songsLinks.map(
+            async songLink =>
+                await axios.get(songLink, {
+                    headers: {
+                        Authorization: 'Bearer ' + accessToken
+                    }
+                })
+        );
+
+        const songs = await Promise.all(songsPromises);
+
+        return songs;
+    }
 }
 
 export default App;

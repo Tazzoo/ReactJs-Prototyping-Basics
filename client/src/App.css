@@ -1,3 +1,33 @@
 .App {
   text-align: center;
 }
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Bellefair', 'Open Sans', 'Roboto', serif;
+  font-size: 1.2rem;
+  background-color: #eee;
+}
+
+.rl-card {
+  margin: 10px 0px;
+}
+
+@media screen and (max-width: 770px) {
+  .rl-title {
+    margin: 10px auto !important;
+  }
+
+  .rl-filter {
+    margin: 0 auto;
+  }
+
+  .rl-playlist {
+    margin: 15px 0px !important;
+    width: 95vw !important;
+  }
+  .rl-card {
+    display: none;
+  }
+}

@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  react-spotify:
+    image: tazoo/react-spotify
+    build: .
+    # environment:
+      # NODE_ENV: production
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
