@@ -1,16 +1,21 @@
 import React from 'react';
 import axios from 'axios';
-import queryString from 'querystring';
 import _ from 'lodash';
+import styled from 'styled-components';
+import queryString from 'querystring';
 
 // Components
-import Navbar from './components/navbar/Navbar';
-import Header from './components/header/Header';
-import Playlists from './components/playlists/Playlists';
-import NotLoggedIn from './components/NotLoggedIn';
+import Navbar from 'components/navbar/Navbar';
+import Header from 'components/header/Header';
+import Playlists from 'components/playlists/Playlists';
+import NotLoggedIn from 'components/NotLoggedIn';
 
 // CSS
 import './App.css';
+
+const AppContainer = styled.div`
+    text-align: center;
+`;
 
 class App extends React.Component {
     constructor(props) {
@@ -65,7 +70,7 @@ class App extends React.Component {
                     // Compara se o nome no filtro bate com o nome de alguma musica
                     let allSongsName = [];
                     const playlistSongsName = this.getPlaylistSongsName(playlist);
-                    
+
                     if (_.isEmpty(allSongsName)) {
                         allSongsName = playlistSongsName;
                     } else {
@@ -95,7 +100,7 @@ class App extends React.Component {
             homepage = <NotLoggedIn findEnv={this.findEnv} />;
         }
 
-        return <div className='App mb-5'>{homepage}</div>;
+        return <AppContainer className='mb-5'>{homepage}</AppContainer>;
     }
 
     handleChange(event) {

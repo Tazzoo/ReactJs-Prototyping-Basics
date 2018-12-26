@@ -1,15 +1,20 @@
 import React from 'react';
+import styled from 'styled-components';
+
+const HoursCounterContainer = styled.div`
+    flex-grow: 1;
+`;
 
 const HoursCounter = ({ playlists }) => {
     const totalMilliseconds = getTotalMilliseconds(playlists);
     const time = millisecondsToTime(totalMilliseconds);
 
     return (
-        <div className='card rl-card' style={{ display: 'inline-block', width: '30%' }}>
+        <HoursCounterContainer className='card rl-card col-lg-3'>
             <div className='card-body'>
                 <h5 className='card-text'>{time}</h5>
             </div>
-        </div>
+        </HoursCounterContainer>
     );
 
     function getTotalMilliseconds(playlists) {

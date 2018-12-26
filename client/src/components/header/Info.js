@@ -1,11 +1,16 @@
 import React from 'react';
+import styled from 'styled-components';
 
-const Navbar = props => (
-    <div className='card rl-card' style={{ display: 'inline-block', width: '30%' }}>
+const InfoContainer = styled.div`
+    flex-grow: 1;
+`;
+
+const Info = props => (
+    <InfoContainer className='card rl-card col-lg-4 mx-auto'>
         <div className='card-body'>
             <h5 className='card-text'>Musica [Popularidade]</h5>
         </div>
-    </div>
+    </InfoContainer>
 );
 
-export default Navbar;
+export default Info;
