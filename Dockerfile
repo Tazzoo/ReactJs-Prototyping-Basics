@@ -12,7 +12,7 @@ WORKDIR /usr/src/app
 COPY ["package.json", "package-lock.json*", "./"]
 
 # Run npm commands
-RUN npm i -g nodemon && npm i --production
+RUN npm i -g --unsafe-perm nodemon && npm i --production
 
 # Copy app source code
 COPY . .
