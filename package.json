@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "concurrently \"npm:server\" \"npm:client\"",
-    "client": "cd client && npm i && npm start",
-    "server": "node server.js"
+    "start": "node server.js",
+    "dev": "concurrently \"npm:server\" \"npm:client\"",
+    "server": "nodemon server.js",
+    "client": "cd client && npm i && npm start"
   },
   "dependencies": {
     "axios": "^0.18.0",
