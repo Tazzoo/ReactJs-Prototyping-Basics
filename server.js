@@ -8,6 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const client_id = process.env.SPOTIFY_CLIENT_ID || config.SPOTIFY_CLIENT_ID;
 const client_password = process.env.SPOTIFY_CLIENT_PASSWORD || config.SPOTIFY_CLIENT_PASSWORD;
+const frontend_uri = process.env.FRONTEND_URI || `http://localhost:${PORT}`;
 const redirect_uri = process.env.REDIRECT_URI || `http://localhost:${PORT}/callback`;
 
 app.get('/login', function(req, res) {
@@ -40,7 +41,7 @@ app.get('/callback', function(req, res) {
 
     request.post(authOptions, function(error, response, body) {
         const { access_token } = body;
-        const uri = process.env.FRONTEND_URI || `http://localhost:${PORT}`;
+        const uri = frontend_uri || `http://localhost:${PORT}`;
 
         res.redirect(uri + '?access_token=' + access_token);
     });
