@@ -6,7 +6,8 @@
     "start": "node server.js",
     "dev": "concurrently \"npm:server\" \"npm:client\"",
     "server": "nodemon server.js",
-    "client": "cd client && npm i && npm start"
+    "client": "cd client && npm i && npm start",
+    "heroku-postbuild": "cd client && npm install && npm run build"
   },
   "dependencies": {
     "axios": "^0.18.0",
