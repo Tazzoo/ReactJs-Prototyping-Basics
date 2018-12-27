@@ -109,7 +109,7 @@ class App extends React.Component {
 
     findEnv() {
         if (window.location.href.includes('localhost')) {
-            return 'http://localhost:8888/login';
+            return 'http://localhost:5000/login';
         }
 
         return 'https://react-ans-spotify-backend.herokuapp.com/login';

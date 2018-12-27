@@ -1,9 +1,9 @@
 import React from 'react';
 
-const NotLoggedIn = props => (
+const NotLoggedIn = ({ findEnv }) => (
     <section style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <a
-            href={props.findEnv()}
+            href={findEnv()}
             style={{
                 width: '300px',
                 padding: '10px 20px',
