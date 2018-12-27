@@ -3,7 +3,7 @@ LABEL maintainer="Tacio de Souza"
 # ENV PORT 8888
 
 # Setting Environment Variable to Production
-# ENV NODE_ENV production
+ENV NODE_ENV production
 
 # Create app directory and go to that
 WORKDIR /usr/src/app
@@ -21,5 +21,5 @@ COPY . .
 # EXPOSE 8888
 
 # Initial command
-CMD npm start
+CMD npm start && cd client && npm install && npm run build
 # CMD npm run dev

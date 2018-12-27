@@ -1,9 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
+import sizes from 'client_config/screenSize';
 
 const Filter = ({ filter, handleChange }) => {
     const Filter = styled.div`
-        
+        @media (max-width: ${sizes.tablet}) {
+            margin: 0 auto;
+        }
     `;
 
     return (

@@ -112,7 +112,7 @@ class App extends React.Component {
             return 'http://localhost:5000/login';
         }
 
-        return 'https://react-ans-spotify-backend.herokuapp.com/login';
+        return '/login';
     }
 
     setUserAccessToken() {
