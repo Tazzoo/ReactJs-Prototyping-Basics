@@ -1,6 +1,5 @@
 FROM node:8.9-alpine
-LABEL maintainer="Tacio de Souza"
-# ENV PORT 8888
+LABEL maintainer="Tacio de Souza Campos"
 
 # Setting Environment Variable to Production
 ENV NODE_ENV production
@@ -12,14 +11,10 @@ WORKDIR /usr/src/app
 COPY ["package.json", "package-lock.json*", "./"]
 
 # Run npm commands
-RUN npm i -g --unsafe-perm nodemon && npm i --production
+RUN npm i --production
 
 # Copy app source code
 COPY . .
 
-# Expose port and start application
-# EXPOSE 8888
-
 # Initial command
-CMD npm start && cd client && npm install && npm run build
-# CMD npm run dev
+CMD npm start

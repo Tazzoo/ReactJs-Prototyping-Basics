@@ -1,5 +1,5 @@
 {
-  "name": "react-spotify-server",
+  "name": "rspotify-server",
   "version": "1.0.0",
   "main": "server.js",
   "engines": {
@@ -7,10 +7,11 @@
   },
   "scripts": {
     "start": "node server.js",
-    "dev": "concurrently \"npm:server\" \"npm:client\"",
+    "dev": "concurrently \"npm:server\" \"npm:build\"",
     "server": "nodemon server.js",
+    "build": "cd client && npm i && npm run build",
     "client": "cd client && npm i && npm start",
-    "heroku-postbuild": "cd client && npm install && npm run build"
+    "heroku-postbuild": "cd client && npm i && npm run build"
   },
   "dependencies": {
     "axios": "^0.18.0",

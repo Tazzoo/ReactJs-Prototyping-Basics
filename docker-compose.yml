@@ -2,8 +2,8 @@ version: '3'
 
 services:
   react-spotify:
-    container_name: react-spotify
-    image: tazoo/react-spotify
+    container_name: rspotify
+    image: t4zo/rspotify
     build: 
       context: .
       dockerfile: Dockerfile
