@@ -7,7 +7,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "dev": "concurrently \"npm:server\" \"npm:build\"",
+    "dev": "concurrently \"npm:start\" \"npm:build\"",
     "server": "nodemon server.js",
     "build": "cd client && npm i && npm run build",
     "client": "cd client && npm i && npm start",

@@ -17,4 +17,4 @@ RUN npm i --production
 COPY . .
 
 # Initial command
-CMD npm start
+CMD npm run dev
